@@ -41,20 +41,36 @@ module LanguageClassifier
 
     describe "#classify" do
 
-      it "should return 'English' when given an English document" do
+      before(:each) do
         classifier.train("French", "Le renard brun rapide saute par-dessus le chien paresseux")
         classifier.train("Latin", "Brunneis vulpes salit super piger canis vivorum")
         classifier.train("Filipino", "Ang mabilis na brown soro jumps sa ibabaw ng tamad na aso")
+        classifier.train("Hungarian", "A gyors barna róka átugorja a lusta kutyát")
+        classifier.train("Afrikaans", "Die vinnige bruin jakkals spring oor die lui hond")
+      end
 
+      it "should return 'English' when given an English document" do
         classifier.classify("The lazy dog jumps over the quick brown fox").should eq("English")
       end
 
-      it "should return 'Latin' when given an Latin document" do
-        classifier.train("French", "Le renard brun rapide saute par-dessus le chien paresseux")
-        classifier.train("Latin", "Brunneis vulpes salit super piger canis vivorum")
-        classifier.train("Filipino", "Ang mabilis na brown soro jumps sa ibabaw ng tamad na aso")
-
+      it "should return 'Latin' when given a Latin document" do
         classifier.classify("Vivos brunneis vulpes salit super piger canis").should eq("Latin")
+      end
+
+      it "should return 'Filipino' given a Filipino document" do
+        classifier.classify("Ang tamad na aso jumps sa ibabaw ng mabilis na brown soro").should eq("Filipino")
+      end
+
+      it "should return 'French' given a French document" do
+        classifier.classify("Le chien paresseux saute par-dessus le renard brun rapide").should eq("French")
+      end
+
+      it "should return 'Hungarian' given a Hungarian document" do
+        classifier.classify("A lusta kutya átugorja a gyors barna róka").should eq("Hungarian")
+      end
+
+      it "should return 'Afrikaans' given a Afrikaans document" do
+        classifier.classify("Die lui hond spring oor die vinnige bruin jakkals").should eq("Afrikaans")
       end
 
     end
