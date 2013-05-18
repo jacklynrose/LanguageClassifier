@@ -3,10 +3,10 @@ require 'spec_helper'
 module LanguageClassifier
   describe Classifier do
 
-    describe "#train" do
+    let(:classifier) { Classifier.new }
+    before(:each) { classifier.train("English", "The quick brown fox jumps over the lazy dog") }
 
-      let(:classifier) { Classifier.new }
-      before(:each) { classifier.train("English", "The quick brown fox jumps over the lazy dog") }
+    describe "#train" do
 
       context "no previous training for category" do
 
@@ -41,7 +41,21 @@ module LanguageClassifier
 
     describe "#classify" do
 
-      it "should return the most probable category"
+      it "should return 'English' when given an English document" do
+        classifier.train("French", "Le renard brun rapide saute par-dessus le chien paresseux")
+        classifier.train("Latin", "Brunneis vulpes salit super piger canis vivorum")
+        classifier.train("Filipino", "Ang mabilis na brown soro jumps sa ibabaw ng tamad na aso")
+
+        classifier.classify("The lazy dog jumps over the quick brown fox").should eq("English")
+      end
+
+      it "should return 'Latin' when given an Latin document" do
+        classifier.train("French", "Le renard brun rapide saute par-dessus le chien paresseux")
+        classifier.train("Latin", "Brunneis vulpes salit super piger canis vivorum")
+        classifier.train("Filipino", "Ang mabilis na brown soro jumps sa ibabaw ng tamad na aso")
+
+        classifier.classify("Vivos brunneis vulpes salit super piger canis").should eq("Latin")
+      end
 
     end
 
