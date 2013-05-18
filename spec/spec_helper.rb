@@ -1,1 +1,1 @@
-require 'language_classifer'
+require 'language_classifier'
