@@ -1,3 +1,9 @@
+GIT
+  remote: git://github.com/ghostganz/madeleine.git
+  revision: ab48a691fdf4feceaa14a298ae0d064968c51986
+  specs:
+    madeleine (0.8.1.pre)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -16,5 +22,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  madeleine!
   rspec
   stemmer

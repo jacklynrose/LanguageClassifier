@@ -1,0 +1,56 @@
+#!/usr/bin/env ruby
+$LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
+require 'language_classifier'
+require 'madeleine'
+
+class TrainCommand
+
+  def initialize(category, document)
+    @category, @document = category, document
+  end
+
+  def execute(system)
+    system.train(@category, @document)
+  end
+
+end
+
+class ClassifyQuery
+  def initialize(document)
+    @document = document
+  end
+
+  def execute(system)
+    system.classify(@document)
+  end
+end
+
+madeleine = SnapshotMadeleine.new('tmp/language_classifier') do
+  LanguageClassifier::Classifier.new
+end
+
+options = Hash.new
+options[:command] = ARGV.first
+ARGV.each do |arg|
+  case arg
+  when '-f'
+    options[:file] = ARGV[ARGV.index(arg) + 1]
+  when '-c'
+    options[:category] = ARGV[ARGV.index(arg) + 1]
+  end
+end
+
+case options[:command]
+when "train"
+  cmd = TrainCommand.new(options[:category], File.open(options[:file], "r").read)
+  madeleine.execute_command(cmd)
+  madeleine.take_snapshot
+when "classify"
+  cmd = ClassifyQuery.new(File.open(options[:file], "r").read)
+  puts madeleine.execute_query(cmd)
+else
+  puts "Arguments formatted incorrectly"
+  puts
+  puts "Training: bin/classify train -f FILE_PATH -c CATEGORY"
+  puts "Classification: bin/classify classify -f FILE_PATH"
+end
