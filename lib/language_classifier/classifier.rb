@@ -1,3 +1,5 @@
+require 'bigdecimal'
+
 module LanguageClassifier
   class Classifier
 
@@ -36,27 +38,27 @@ module LanguageClassifier
     def probabilities(document)
       probabilities = Hash.new
       @words.each_key do |category|
-        probabilities[category] = probability(category, document)
+        probabilities[category] = BigDecimal.new(probability(category, document).to_s)
       end
       return probabilities
     end
 
     def probability(category, document)
-      doc_probability(category, document) * category_probability(category)
+      BigDecimal.new(doc_probability(category, document).to_s) * BigDecimal.new(category_probability(category).to_s)
     end
 
     def category_probability(category)
-      @category_documents[category].to_f/@total_documents.to_f
+      BigDecimal.new(@category_documents[category].to_s)/BigDecimal.new(@total_documents.to_s)
     end
 
     def doc_probability(category, document)
-      doc_prob = 1
-      word_count(document).each { |word| doc_prob *= word_probability(category, word[0]) }
-      return doc_prob
+      doc_prob = BigDecimal.new("1")
+      word_count(document).each { |word| doc_prob *= BigDecimal.new(word_probability(category, word[0])) }
+      return BigDecimal.new(doc_prob.to_s)
     end
 
     def word_probability(category, word)
-      (@words[category][word.stem].to_f + 1)/@category_words[category].to_f
+      (BigDecimal.new(@words[category][word.stem].to_s) + BigDecimal.new("1"))/BigDecimal.new(@category_words[category].to_s)
     end
 
     def word_count(document)
