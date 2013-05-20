@@ -1,45 +1,8 @@
 #!/usr/bin/env ruby
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
-require 'language_classifier'
-require 'madeleine_commands'
-require 'madeleine'
+require 'bundler'
+Bundler.require
+require 'classifier_controller'
 require 'pp'
 
-madeleine = SnapshotMadeleine.new('tmp/language_classifier') do
-  LanguageClassifier::Classifier.new
-end
-
-options = Hash.new
-options[:command] = ARGV.first
-ARGV.each do |arg|
-  case arg
-  when '-f'
-    options[:file] = ARGV[ARGV.index(arg) + 1]
-  when '-c'
-    options[:category] = ARGV[ARGV.index(arg) + 1]
-  end
-end
-
-case options[:command]
-when "train"
-  cmd = MadeleineCommands.train_command(options[:category], File.open(options[:file], "r").read)
-  madeleine.execute_command(cmd)
-  madeleine.take_snapshot
-when "classify"
-  cmd = MadeleineCommands.classify_query(File.open(options[:file], "r").read)
-  puts madeleine.execute_query(cmd)
-when "seed"
-  puts "SEEDING DATA FROM SAMPLES - excludes test files"
-  %w[afrikaans danish english filipino french hungarian latin romanian].each do |category|
-    puts "Seeding data with: #{category}"
-    cmd = MadeleineCommands.train_command(category, File.open(File.expand_path('../../', __FILE__) + "/samples/#{category}.txt", "r").read)
-    madeleine.execute_command(cmd)
-  end
-  madeleine.take_snapshot
-else
-  puts "Arguments formatted incorrectly"
-  puts
-  puts "Training: bin/classify train -f FILE_PATH -c CATEGORY"
-  puts "Classification: bin/classify classify -f FILE_PATH"
-  puts "Seed: bin/classify seed"
-end
+ClassifierController.process(*ARGV, STDOUT)
