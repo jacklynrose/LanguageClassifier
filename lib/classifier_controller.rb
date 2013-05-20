@@ -11,11 +11,7 @@ class ClassifierController
     if self.respond_to?(options[:command])
       self.send(options[:command], options)
     else
-      options[:output].puts "Command not found"
-      options[:output].puts
-      options[:output].puts "Training: bin/classify train -f FILE_PATH -c CATEGORY"
-      options[:output].puts "Classification: bin/classify classify -f FILE_PATH"
-      options[:output].puts "Seed: bin/classify seed"
+      options[:output].puts "Command not found", "", "Training: bin/classify train -f FILE_PATH -c CATEGORY", "Classification: bin/classify classify -f FILE_PATH", "Seed: bin/classify seed"
     end
   end
 
@@ -60,10 +56,10 @@ class ClassifierController
 
   def self.seed(options)
     SEED_CATEGORIES.each do |category|
-      cmd = MadeleineCommands.train_command(category, File.open(File.expand_path('../../', __FILE__) + "/samples/#{category}.txt", "r").read)
-      madeleine(options[:madeleine]).execute_command(cmd)
+      self.train(category: category,
+                  document: File.open(File.expand_path('../../', __FILE__) + "/samples/#{category}.txt", "r").read,
+                  madeleine: options[:madeleine])
     end
-    madeleine(options[:madeleine]).take_snapshot
   end
 
   def self.clear(options)
