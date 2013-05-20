@@ -11,7 +11,11 @@ class ClassifierController
     if self.respond_to?(options[:command])
       self.send(options[:command], options)
     else
-      options[:output].puts "Command not found", "", "Training: bin/classify train -f FILE_PATH -c CATEGORY", "Classification: bin/classify classify -f FILE_PATH", "Seed: bin/classify seed"
+      options[:output].puts "Command not found", "",
+                            "Training: bin/classify train -f FILE_PATH -c CATEGORY",
+                            "Classification: bin/classify classify -f FILE_PATH",
+                            "Seed: bin/classify seed",
+                            "Clear All Data: bin/classify clear"
     end
   end
 
@@ -30,9 +34,19 @@ class ClassifierController
     args.each do |arg|
       case arg
       when '-f'
-        options[:document] = File.open(args[args.index(arg) + 1], "r").read
+        filename = args[args.index(arg) + 1]
+        if filename && File.exists?(filename)
+          options[:document] = File.open(filename, "r").read
+        else
+          options[:output].puts "The file you requested could not be found"
+        end
       when '-c'
-        options[:category] = args[args.index(arg) + 1]
+        category = args[args.index(arg) + 1]
+        if category
+          options[:category] = category
+        else
+          options[:output].puts "No category supplied"
+        end
       when '--db'
         options[:madeleine] = args[args.index(arg) + 1]
       end
@@ -42,16 +56,20 @@ class ClassifierController
   end
 
   def self.train(options)
-    cmd = MadeleineCommands.train_command(options[:category], options[:document])
-    madeleine(options[:madeleine]).execute_command(cmd)
-    madeleine(options[:madeleine]).take_snapshot
+    if options[:document] && options[:category]
+      cmd = MadeleineCommands.train_command(options[:category], options[:document])
+      madeleine(options[:madeleine]).execute_command(cmd)
+      madeleine(options[:madeleine]).take_snapshot
+    end
   end
 
   def self.classify(options)
-    cmd = MadeleineCommands.classify_query(options[:document])
-    result = madeleine(options[:madeleine]).execute_query(cmd)
-    options[:output].puts result
-    result
+    if options[:document]
+      cmd = MadeleineCommands.classify_query(options[:document])
+      result = madeleine(options[:madeleine]).execute_query(cmd)
+      options[:output].puts result
+      result
+    end
   end
 
   def self.seed(options)
