@@ -29,18 +29,13 @@ module LanguageClassifier
     end
 
     def classify(document)
-      sorted = probabilities(document).sort { |a, b| a[1]<=>b[1] }
-      return sorted.pop[0]
+      probabilities(document).sort { |a, b| a[1]<=>b[1] }.pop[0]
     end
 
     private
 
     def probabilities(document)
-      probabilities = Hash.new
-      @words.each_key do |category|
-        probabilities[category] = BigDecimal.new(probability(category, document).to_s)
-      end
-      return probabilities
+      @words.keys.inject({}) { |hash, category| hash.merge({category => probability(category, document)}) }
     end
 
     def probability(category, document)
@@ -52,9 +47,7 @@ module LanguageClassifier
     end
 
     def doc_probability(category, document)
-      doc_prob = BigDecimal.new("1")
-      word_count(document).each { |word| doc_prob *= BigDecimal.new(word_probability(category, word[0])) }
-      return BigDecimal.new(doc_prob.to_s)
+      word_count(document).inject(BigDecimal.new("1")) { |doc_prob, word| doc_prob *= BigDecimal.new(word_probability(category, word[0])) }
     end
 
     def word_probability(category, word)
@@ -62,16 +55,11 @@ module LanguageClassifier
     end
 
     def word_count(document)
-      document_words = document.gsub(/[^\w\s]/, "").split
-      d = Hash.new
+      document_words(document).inject({}) { |hash, key| hash.merge({key => (hash[key] ? hash[key] + 1 : 1)}) }
+    end
 
-      document_words.each do |document_word|
-        key = document_word.downcase.stem
-        d[key] ||= 0
-        d[key] += 1
-      end
-
-      return d
+    def document_words(document)
+      document.gsub(/[^\w\s]/, "").split.map { |w| w.downcase.stem }
     end
 
   end

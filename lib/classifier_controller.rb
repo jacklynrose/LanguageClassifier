@@ -9,7 +9,9 @@ class ClassifierController
     options = process_options(*args, output)
 
     if self.respond_to?(options[:command])
-      self.send(options[:command], options)
+      result = self.send(options[:command], options)
+      options[:output].puts result if result
+      result
     else
       options[:output].puts "Command not found", "",
                             "Training: bin/classify train -f FILE_PATH -c CATEGORY",
@@ -35,18 +37,10 @@ class ClassifierController
       case arg
       when '-f'
         filename = args[args.index(arg) + 1]
-        if filename && File.exists?(filename)
-          options[:document] = File.open(filename, "r").read
-        else
-          options[:output].puts "The file you requested could not be found"
-        end
+        filename && File.exists?(filename) ? options[:document] = File.open(filename, "r").read : options[:output].puts("The file you requested could not be found")
       when '-c'
         category = args[args.index(arg) + 1]
-        if category
-          options[:category] = category
-        else
-          options[:output].puts "No category supplied"
-        end
+        category ? options[:category] = category : options[:output].puts("No category supplied")
       when '--db'
         options[:madeleine] = args[args.index(arg) + 1]
       end
@@ -57,18 +51,14 @@ class ClassifierController
 
   def self.train(options)
     if options[:document] && options[:category]
-      cmd = MadeleineCommands.train_command(options[:category], options[:document])
-      madeleine(options[:madeleine]).execute_command(cmd)
+      madeleine(options[:madeleine]).execute_command(MadeleineCommands.train_command(options[:category], options[:document]))
       madeleine(options[:madeleine]).take_snapshot
     end
   end
 
   def self.classify(options)
     if options[:document]
-      cmd = MadeleineCommands.classify_query(options[:document])
-      result = madeleine(options[:madeleine]).execute_query(cmd)
-      options[:output].puts result
-      result
+      madeleine(options[:madeleine]).execute_query(MadeleineCommands.classify_query(options[:document]))
     end
   end
 

@@ -53,6 +53,24 @@ describe ClassifierController do
 
     end
 
+    context "file not found" do
+
+      it "should tell the user that the file could not be found" do
+        output.shoud_receive(:puts).with("The file you requested could not be found")
+        ClassifierController.process('train', '-f', output)
+      end
+
+    end
+
+    context "category not supplied" do
+
+      it "should tell the user that the category was not supplied" do
+        output.shoud_receive(:puts).with("No category supplied")
+        ClassifierController.process('train', '-c', output)
+      end
+
+    end
+
   end
 
 end
