@@ -1,6 +1,8 @@
 LanguageClassifer
 =================
 
+[![Build Status](https://travis-ci.org/[YOUR_GITHUB_USERNAME]/[YOUR_PROJECT_NAME].png)](https://travis-ci.org/[YOUR_GITHUB_USERNAME]/[YOUR_PROJECT_NAME])
+
 Download LanguageClassifier, train it with text files that you know the language/category of, then have it classify text files that you don't know the language/category of.
 
 LanguageClassifer uses a simplified version of Bayes' Law, an algorithm used in spam detection systems.
