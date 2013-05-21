@@ -1,7 +1,7 @@
 LanguageClassifer
 =================
 
-[![Build Status](https://travis-ci.org/FluffyJack/LanguageClassifier.png)](https://travis-ci.org/FluffyJack/LanguageClassifier)
+[![Build Status](https://travis-ci.org/FluffyJack/LanguageClassifier.png?branch=master)](https://travis-ci.org/FluffyJack/LanguageClassifier)
 
 Download LanguageClassifier, train it with text files that you know the language/category of, then have it classify text files that you don't know the language/category of.
 
